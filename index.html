@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Jogo de revisão do 4º bimestre de Filosofia (3ª série, nível avançado).">
+<title>Arena Filosófica 3ª Série</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: uma coluna central; no professor, telão com código-bilhete e cronômetro; no grupo, celular com botões grandes. */
+:root{
+  --bg:#EDF0F6; --surface:#FFFFFF; --surface-2:#F6F7FB; --ink:#141B33; --muted:#566079; --line:#D3D9E6;
+  --accent:#2340C2; --accent-ink:#FFFFFF; --ok:#17804A; --ok-bg:#E1F3E8; --bad:#B83227; --bad-bg:#FBE5E1;
+  --b-contrato:#0E7570; --b-kant:#3A48B0; --b-util:#A3650A; --b-schop:#82348A; --b-nietz:#B03131; --b-fouc:#367026; --b-final:#141B33;
+  --ticket:#141B33; --ticket-ink:#FFFFFF;
+  --f-display:"Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0E1325; --surface:#171E37; --surface-2:#1D2542; --ink:#E8EBF5; --muted:#A1A9C3; --line:#2C3557;
+  --accent:#8EA2FF; --accent-ink:#0E1325; --ok:#5ED38F; --ok-bg:#12321F; --bad:#FF8B7B; --bad-bg:#3A1916;
+  --b-contrato:#3CC0BA; --b-kant:#97A3F7; --b-util:#F0B24B; --b-schop:#D78BDB; --b-nietz:#F28C8C; --b-fouc:#8FCC76; --b-final:#E8EBF5;
+  --ticket:#E8EBF5; --ticket-ink:#0E1325; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0E1325; --surface:#171E37; --surface-2:#1D2542; --ink:#E8EBF5; --muted:#A1A9C3; --line:#2C3557;
+  --accent:#8EA2FF; --accent-ink:#0E1325; --ok:#5ED38F; --ok-bg:#12321F; --bad:#FF8B7B; --bad-bg:#3A1916;
+  --b-contrato:#3CC0BA; --b-kant:#97A3F7; --b-util:#F0B24B; --b-schop:#D78BDB; --b-nietz:#F28C8C; --b-fouc:#8FCC76; --b-final:#E8EBF5;
+  --ticket:#E8EBF5; --ticket-ink:#0E1325; color-scheme:dark }
+
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg); color:var(--ink); font-family:var(--f-body); font-size:17px; line-height:1.45;
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); padding-block:18px 40px}
+#app{max-width:1080px; margin:0 auto; display:flex; flex-direction:column; gap:18px}
+h1,h2,h3{font-family:var(--f-display); text-wrap:balance; margin:0; letter-spacing:-0.01em}
+p{margin:0}
+button,input{font:inherit; color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.muted{color:var(--muted)}
+.eyebrow{font-family:var(--f-display); font-weight:700; font-size:.78rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
+
+.btn{border:0; border-radius:12px; padding:14px 20px; font-weight:700; font-size:1.02rem; background:var(--accent); color:var(--accent-ink); min-height:52px; display:inline-flex; align-items:center; justify-content:center; gap:8px}
+.btn:disabled{opacity:.45; cursor:not-allowed}
+.btn.ghost{background:transparent; color:var(--ink); border:2px solid var(--line)}
+.btn.danger{background:transparent; color:var(--bad); border:2px solid var(--bad)}
+.btn.wide{width:100%}
+.row{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
+.row.end{justify-content:flex-end}
+.spread{display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between}
+
+/* cabeçalho da marca */
+.brand{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap}
+.brand h1{font-size:clamp(2rem, 6vw, 3.4rem); font-weight:800; line-height:.95}
+.brand h1 span{display:block; font-size:.42em; font-weight:500; letter-spacing:.02em; color:var(--muted); margin-top:6px}
+.ticker{font-family:var(--f-display); font-size:.86rem; color:var(--muted); letter-spacing:.04em}
+
+/* início */
+.roles{display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px}
+.role{background:var(--surface); border:2px solid var(--line); border-radius:var(--r); padding:22px; text-align:left; display:flex; flex-direction:column; gap:10px; min-height:180px}
+.role:hover{border-color:var(--accent)}
+.role h2{font-size:1.6rem}
+.role .tag{font-family:var(--f-display); font-weight:700; font-size:.8rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent)}
+.how{display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:14px}
+.how div{border-top:3px solid var(--ink); padding-top:10px}
+.how b{font-family:var(--f-display); display:block; font-size:1.05rem; margin-bottom:4px}
+
+/* painel */
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:20px; display:flex; flex-direction:column; gap:14px; min-width:0}
+.panel h2{font-size:1.35rem}
+.blocks{display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:10px}
+.blk{display:flex; gap:12px; align-items:flex-start; border:2px solid var(--line); border-radius:12px; padding:12px 14px; cursor:pointer; background:var(--surface-2)}
+.blk input{width:22px; height:22px; margin:2px 0 0; accent-color:var(--accent); flex:none}
+.blk b{font-family:var(--f-display); display:block}
+.blk small{color:var(--muted)}
+.blk:has(input:checked){border-color:var(--bc, var(--accent))}
+.teams{display:flex; flex-direction:column; gap:8px}
+.team-row{display:flex; gap:8px; align-items:center}
+.team-row input[type=text]{flex:1; min-width:0; padding:12px; border:2px solid var(--line); border-radius:10px; background:var(--surface-2)}
+.dot{width:26px; height:26px; border-radius:50%; flex:none; border:2px solid var(--surface)}
+.icon-btn{border:2px solid var(--line); background:transparent; border-radius:10px; min-width:46px; min-height:46px; font-size:1.2rem; font-weight:700}
+
+/* chips de bloco */
+.chip{display:inline-flex; align-items:center; gap:8px; font-family:var(--f-display); font-weight:700; font-size:.82rem; letter-spacing:.06em; text-transform:uppercase; color:var(--bc); border:2px solid var(--bc); border-radius:999px; padding:4px 12px}
+.chip.dobro{background:var(--bc); color:var(--surface)}
+
+/* barra do professor */
+.topbar{display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+.progress{flex:1 1 200px; height:8px; background:var(--line); border-radius:99px; overflow:hidden; min-width:120px}
+.progress i{display:block; height:100%; background:var(--ink)}
+.count{font-family:var(--f-display); font-weight:700; font-variant-numeric:tabular-nums}
+
+/* bilhete com o código */
+.stage{display:grid; grid-template-columns:minmax(0,1fr); gap:18px}
+.ticket{background:var(--ticket); color:var(--ticket-ink); border-radius:18px; padding:26px 28px; display:flex; flex-direction:column; align-items:center; gap:6px; position:relative; text-align:center}
+.ticket::before,.ticket::after{content:""; position:absolute; top:50%; width:26px; height:26px; border-radius:50%; background:var(--bg); transform:translateY(-50%)}
+.ticket::before{left:-13px} .ticket::after{right:-13px}
+.ticket .code{font-family:var(--f-display); font-weight:800; font-size:clamp(4rem, 16vw, 9rem); letter-spacing:.14em; line-height:1; font-variant-numeric:tabular-nums; padding-left:.14em}
+.ticket small{font-size:1rem; opacity:.8}
+.mini-ticket{display:inline-flex; gap:10px; align-items:baseline; background:var(--ticket); color:var(--ticket-ink); border-radius:10px; padding:6px 14px; font-family:var(--f-display)}
+.mini-ticket b{font-size:1.5rem; letter-spacing:.12em}
+
+/* pergunta */
+.question{display:flex; flex-direction:column; gap:14px}
+.question h2{font-size:clamp(1.35rem, 3.2vw, 2.1rem); line-height:1.2}
+.quote{font-family:var(--f-display); font-weight:500; font-size:clamp(1.2rem, 3vw, 1.8rem); line-height:1.3; border-left:5px solid var(--bc, var(--ink)); padding:4px 0 4px 16px}
+.alts{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; list-style:none; margin:0; padding:0}
+.alt{display:flex; gap:12px; align-items:flex-start; background:var(--surface); border:2px solid var(--line); border-radius:12px; padding:14px 16px; font-size:clamp(1rem, 2vw, 1.25rem); text-align:left; width:100%; min-width:0}
+.alt .L{flex:none; width:36px; height:36px; border-radius:9px; display:grid; place-items:center; font-family:var(--f-display); font-weight:800; background:var(--ink); color:var(--surface)}
+.alt.right{border-color:var(--ok); background:var(--ok-bg)}
+.alt.right .L{background:var(--ok)}
+.alt.dim{opacity:.38}
+.explain{background:var(--surface-2); border:2px solid var(--ok); border-radius:12px; padding:14px 16px; font-size:1.08rem}
+.explain b{color:var(--ok)}
+
+.afirm{list-style:none; margin:0; padding:14px 16px; display:flex; flex-direction:column; gap:10px; background:var(--surface-2); border:1px solid var(--line); border-radius:12px; font-size:clamp(1rem, 2vw, 1.25rem)}
+.afirm li{display:flex; gap:10px; align-items:flex-start}
+.afirm b{font-family:var(--f-display); min-width:2.2ch; flex:none}
+/* cronômetro */
+.clock{display:flex; align-items:center; gap:14px}
+.clock .num{font-family:var(--f-display); font-weight:800; font-size:clamp(2.4rem, 7vw, 4rem); font-variant-numeric:tabular-nums; line-height:1; min-width:2.2ch; text-align:right}
+.clock .bar{flex:1; height:14px; background:var(--line); border-radius:99px; overflow:hidden}
+.clock .bar i{display:block; height:100%; background:var(--accent); transition:width .25s linear}
+.clock.low .bar i{background:var(--bad)} .clock.low .num{color:var(--bad)}
+
+/* placar */
+.score-grid{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); gap:18px}
+.score-in{display:flex; flex-direction:column; gap:8px}
+.score-in label{display:flex; gap:10px; align-items:center}
+.score-in label .nm{flex:1; min-width:0; overflow-wrap:anywhere; font-weight:700}
+.score-in input{width:110px; padding:10px 12px; border:2px solid var(--line); border-radius:10px; background:var(--surface-2); font-family:var(--f-display); font-weight:700; font-size:1.2rem; text-align:right; font-variant-numeric:tabular-nums}
+.rank{display:flex; flex-direction:column; gap:10px; list-style:none; margin:0; padding:0}
+.rank li{display:grid; grid-template-columns:2ch minmax(0,1fr) auto; gap:10px; align-items:center}
+.rank .pos{font-family:var(--f-display); font-weight:800; font-size:1.3rem}
+.rank .track{height:34px; background:var(--surface-2); border-radius:8px; overflow:hidden; position:relative}
+.rank .fill{height:100%; border-radius:8px; display:flex; align-items:center; padding-left:10px; font-weight:700; white-space:nowrap; transition:width .5s ease}
+.rank .pts{font-family:var(--f-display); font-weight:800; font-size:1.3rem; font-variant-numeric:tabular-nums}
+
+/* pódio */
+.podium{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; align-items:end; min-height:320px}
+.step{display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; min-width:0}
+.step .name{font-family:var(--f-display); font-weight:800; font-size:clamp(1rem, 3vw, 1.6rem); overflow-wrap:anywhere}
+.step .block{width:100%; border-radius:12px 12px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding-top:12px; font-family:var(--f-display); font-weight:800}
+.step .block .place{font-size:clamp(2rem, 7vw, 3.6rem); line-height:1}
+.step .block .p{font-size:1.05rem; font-variant-numeric:tabular-nums}
+.step.s1 .block{height:230px} .step.s2 .block{height:170px} .step.s3 .block{height:120px}
+@media (prefers-reduced-motion: no-preference){ .step .block{animation:rise .9s cubic-bezier(.2,.8,.2,1) both} .step.s2 .block{animation-delay:.25s} .step.s1 .block{animation-delay:.5s} }
+@keyframes rise{from{transform:scaleY(.15); transform-origin:bottom; opacity:.4} to{transform:scaleY(1); transform-origin:bottom; opacity:1}}
+
+/* celular do grupo */
+.phone{max-width:560px; width:100%; margin:0 auto; display:flex; flex-direction:column; gap:16px}
+.gbar{display:flex; align-items:center; justify-content:space-between; gap:10px; border-radius:14px; padding:12px 16px}
+.gbar .gname{font-family:var(--f-display); font-weight:800; font-size:1.25rem; overflow-wrap:anywhere; min-width:0}
+.gbar .gpts{font-family:var(--f-display); font-weight:800; font-size:1.6rem; font-variant-numeric:tabular-nums; white-space:nowrap}
+.gbar .gpts small{font-size:.7rem; letter-spacing:.1em; font-weight:700; display:block; text-align:right; opacity:.85}
+.code-in{width:100%; text-align:center; font-family:var(--f-display); font-weight:800; font-size:3rem; letter-spacing:.3em; padding:14px 0 14px .3em; border:3px solid var(--line); border-radius:14px; background:var(--surface); text-transform:uppercase}
+.code-in:focus{border-color:var(--accent); outline:none}
+.err{color:var(--bad); font-weight:700; min-height:1.4em}
+.palette{display:flex; gap:10px; flex-wrap:wrap}
+.swatch{width:48px; height:48px; border-radius:50%; border:3px solid transparent; outline:2px solid var(--line)}
+.swatch[aria-pressed="true"]{border-color:var(--surface); outline:3px solid var(--ink)}
+.field{display:flex; flex-direction:column; gap:6px}
+.field input{padding:14px; border:2px solid var(--line); border-radius:12px; background:var(--surface); font-size:1.1rem}
+.galts{display:flex; flex-direction:column; gap:10px}
+.galt{display:flex; gap:12px; align-items:flex-start; text-align:left; background:var(--surface); border:3px solid var(--line); border-radius:14px; padding:14px; font-size:1.05rem; width:100%}
+.galt .L{flex:none; width:34px; height:34px; border-radius:9px; display:grid; place-items:center; font-family:var(--f-display); font-weight:800; background:var(--surface-2); border:2px solid var(--line)}
+.galt[aria-pressed="true"]{border-color:var(--accent); background:var(--surface-2)}
+.galt[aria-pressed="true"] .L{background:var(--accent); color:var(--accent-ink); border-color:var(--accent)}
+.galt:disabled{cursor:default}
+.locked{border:3px dashed var(--accent); border-radius:16px; padding:22px; text-align:center; display:flex; flex-direction:column; gap:10px; align-items:center}
+.locked .big{font-family:var(--f-display); font-weight:800; font-size:3.4rem; line-height:1}
+.verdict{border-radius:16px; padding:20px; display:flex; flex-direction:column; gap:8px}
+.verdict.ok{background:var(--ok-bg); border:2px solid var(--ok)}
+.verdict.no{background:var(--bad-bg); border:2px solid var(--bad)}
+.verdict h2{font-size:2rem}
+.verdict.ok h2{color:var(--ok)} .verdict.no h2{color:var(--bad)}
+.verdict .gain{font-family:var(--f-display); font-weight:800; font-size:1.4rem; font-variant-numeric:tabular-nums}
+.history{display:flex; flex-wrap:wrap; gap:6px}
+.history span{font-family:var(--f-display); font-weight:700; font-size:.85rem; border-radius:8px; padding:4px 8px; font-variant-numeric:tabular-nums}
+.history .h-ok{background:var(--ok-bg); color:var(--ok)} .history .h-no{background:var(--bad-bg); color:var(--bad)}
+.bigscore{border-radius:20px; padding:34px 20px; text-align:center; display:flex; flex-direction:column; gap:6px}
+.bigscore .n{font-family:var(--f-display); font-weight:800; font-size:clamp(4rem, 22vw, 8rem); line-height:1; font-variant-numeric:tabular-nums}
+.confirm{display:flex; flex-direction:column; gap:10px; border:2px solid var(--bad); border-radius:12px; padding:14px}
+
+@media (max-width:700px){
+  .score-grid{grid-template-columns:minmax(0,1fr)}
+  .alts{grid-template-columns:minmax(0,1fr)}
+  .podium{min-height:250px}
+  .step.s1 .block{height:170px} .step.s2 .block{height:125px} .step.s3 .block{height:90px}
+  body{font-size:16px}
+}
+</style>
+</head>
+<body>
+<div id="app" aria-live="polite"></div>
+
+<script>
+const Q = [{"id":1,"bloco":"maq","tipo":"mc","codigo":"DLTT","enunciado":"O príncipe termina com um apelo aos Médici para que “livrem a Itália das mãos dos bárbaros”. Esse apelo se explica porque a Itália da época:","texto":null,"afirm":null,"alts":["estava unificada sob o papa, que impedia os príncipes locais de governarem com autonomia.","vivia em paz como república, ameaçada apenas pela chegada de povos vindos da Ásia e da África.","estava fragmentada e disputada, enquanto outros reinos já se centralizavam em Estados nacionais.","era governada por um imperador forte, que oprimia as cidades com impostos e exércitos."],"correta":2,"expl":"A península era um “quebra-cabeça” de repúblicas, principados e ducados, enquanto França, Inglaterra, Portugal e Espanha se centralizavam. O livro vislumbra a unificação italiana."},{"id":2,"bloco":"maq","tipo":"mc","codigo":"XDHW","enunciado":"Para Maquiavel, a mesma prudência que leva o governante a se manter no poder também o autoriza a:","texto":null,"afirm":null,"alts":["submeter as suas decisões ao clero, para garantir a salvação espiritual do povo.","descumprir a palavra dada quando ela se tornar um obstáculo aos seus objetivos.","renunciar ao uso da força, pois é muito mais seguro ser amado do que ser temido.","seguir sempre a moral cristã, já que a aparência de bondade deve ser verdadeira."],"correta":1,"expl":"A prudência faz o príncipe não se obrigar a cumprir a palavra que atrapalhe seus fins e não abrir mão da força: “é muito mais seguro ser temido que amado”."},{"id":3,"bloco":"maq","tipo":"mc","codigo":"WUPV","enunciado":"Nos Comentários sobre Tito Lívio, Maquiavel elogia os conflitos entre patrícios e plebeus na Roma antiga porque:","texto":null,"afirm":null,"alts":["mostraram que o povo deve obedecer à aristocracia para que a república não se destrua.","provaram que só um soberano absoluto consegue encerrar a guerra de todos contra todos.","levaram à formação de um governo teocrático, subordinado à autoridade da Igreja.","deles nasceram as leis que protegeram e ampliaram a liberdade, entendida como bem comum."],"correta":3,"expl":"Para o Maquiavel republicano, “todas as leis para proteger a liberdade nascem da desunião”: o conflito entre grupos opostos, mediado pelas leis, garante o bem comum."},{"id":4,"bloco":"maq","tipo":"mc","codigo":"USVR","enunciado":"No século XVIII, Rousseau fez uma leitura original de O príncipe. Segundo ele, Maquiavel teria sido:","texto":null,"afirm":null,"alts":["irônico, satirizando a política do seu tempo, pois suas ideias eram republicanas.","um defensor do direito divino dos reis, contrário a qualquer forma de república.","um precursor do contrato social, que fundava o poder na vontade geral do povo.","um moralista cristão, que escondia conselhos religiosos sob uma linguagem política."],"correta":0,"expl":"Rousseau notou o contraste entre O príncipe e a defesa engajada da república nos Comentários e sugeriu que o livro sobre o príncipe seria, sobretudo, uma sátira."},{"id":5,"bloco":"maq","tipo":"af","codigo":"HAWC","enunciado":"Sobre o pensamento de Maquiavel, analise as afirmativas:","texto":null,"afirm":["Maquiavel é considerado o fundador do campo de saber hoje chamado de Ciência Política.","Para Maquiavel, o governante deve se subordinar ao clero para preparar o povo para a salvação.","O bem comum de uma república pode ser definido previamente e de uma vez por todas."],"alts":["I apenas","II apenas","I e II apenas","I e III apenas"],"correta":0,"expl":"Só a I é correta. Maquiavel emancipa a política da moral cristã (II é falsa), e o bem comum está em constante mudança, sem definição prévia (III é falsa)."},{"id":6,"bloco":"maq","tipo":"mc","codigo":"DKDR","enunciado":"Como conciliar o Maquiavel republicano dos Comentários com o autor de O príncipe? Uma interpretação possível é que:","texto":null,"afirm":null,"alts":["a república é uma utopia, e por isso Maquiavel a abandonou ao escrever O príncipe.","o príncipe forte deve impedir qualquer conflito, já que as dissensões destroem a liberdade.","a república exige um Estado já consolidado, e o príncipe forte traria essa estabilidade.","a república e o principado são idênticos, pois ambos dependem da vontade de Deus."],"correta":2,"expl":"O bem comum da república pede um Estado capaz de acolher os conflitos. Como a Itália fragmentada não tinha esse Estado, seria preciso um príncipe que trouxesse estabilidade."},{"id":7,"bloco":"contrato","tipo":"af","codigo":"AYSY","enunciado":"Sobre Thomas Hobbes, analise as afirmativas:","texto":null,"afirm":["A passagem para o estado de sociedade implica uma privação da liberdade, justificada pela sobrevivência.","No estado de sociedade, o direito natural é preservado, e o direito positivo apenas o confirma.","O medo, que motiva a saída do estado de natureza, também ajuda a manter a nova ordem."],"alts":["I e II apenas","I e III apenas","II e III apenas","I, II e III"],"correta":1,"expl":"I e III estão corretas. A II é falsa: com o contrato não há mais direito natural, mas direito positivo, criado pelos indivíduos numa situação específica."},{"id":8,"bloco":"contrato","tipo":"mc","codigo":"LGNJ","enunciado":"Hobbes aceita o “penso, logo existo”, mas pergunta de onde vem o conhecimento da proposição “eu penso”. A sua resposta mostra que, para ele:","texto":null,"afirm":null,"alts":["a alma é uma substância separada do corpo, anterior a toda percepção dos sentidos.","as ideias são inatas e garantem a verdade antes de qualquer contato com a experiência.","o pensamento é uma representação que encobre a vontade cósmica presente em tudo.","o pensamento resulta da percepção de um corpo material, que se move entre outros corpos."],"correta":3,"expl":"A resposta de Hobbes é: “de um corpo material”. Um corpo que pensa é, sobretudo, matéria, e o pensamento nasce da percepção de outros corpos e de seus movimentos."},{"id":9,"bloco":"contrato","tipo":"mc","codigo":"MMNT","enunciado":"Embora suas ideias tenham ajudado a legitimar o absolutismo, Hobbes antecipou aspectos da modernidade porque:","texto":null,"afirm":null,"alts":["fundou o Estado em um ato voluntário entre indivíduos iguais, livres e dotados de direitos.","defendeu a separação entre Executivo e Legislativo como limite ao poder do soberano.","afirmou que a soberania pertence ao povo e que, por isso, ela não pode ser representada.","baseou a autoridade do governante na vontade divina revelada pela tradição da Igreja."],"correta":0,"expl":"Mesmo o Estado autoritário é, em Hobbes, fruto de uma escolha: não há obrigação que não resulte de um acordo. E sua política descarta qualquer apoio consistente na religião."},{"id":10,"bloco":"contrato","tipo":"mc","codigo":"XCLC","enunciado":"Um fazendeiro cerca todas as nascentes de um vale e passa a cobrar dos vizinhos pelo acesso à água. À luz do estado de natureza descrito por Locke, essa atitude seria:","texto":null,"afirm":null,"alts":["legítima, pois o trabalho de cercar as nascentes já basta para transformá-las em sua propriedade.","condenável, pois só é legítima a propriedade do que se pode usar, sem negar aos outros a natureza.","legítima, pois o soberano absoluto é a única fonte de toda propriedade, e ele pode concedê-la.","condenável, pois toda propriedade privada é a origem da desigualdade e da decadência humana."],"correta":1,"expl":"Para Locke, o trabalho cria a propriedade, mas com limite: ninguém pode ser dono de toda a água do rio nem ter mais terra do que consegue cultivar. A última alternativa é Rousseau."},{"id":11,"bloco":"contrato","tipo":"af","codigo":"UUKK","enunciado":"Comparando Locke a Hobbes, analise as afirmativas:","texto":null,"afirm":["Em Hobbes, o contrato se firma entre os membros da sociedade; em Locke, entre governante e governados.","Para Locke, o crescimento da população e a invenção do dinheiro tornam inviável o estado de natureza.","Locke defendia que o Executivo deve estar subordinado ao Legislativo, limitado pelas leis do povo."],"alts":["I apenas","I e II apenas","II e III apenas","I, II e III"],"correta":3,"expl":"As três estão corretas. A escassez e a acumulação trazidas pelo dinheiro geram desigualdade; o contrato lockeano condiciona o governante; e a separação de poderes limita o Executivo."},{"id":12,"bloco":"contrato","tipo":"mc","codigo":"REXZ","enunciado":"Diversos comentadores criticaram o sistema político de Locke, apesar de ele servir de princípio para resistir à opressão. A principal crítica é a de que:","texto":null,"afirm":null,"alts":["a defesa da resistência leva a guerras sem fim e destrói qualquer ordem política.","a separação de poderes concentra a autoridade nas mãos de um único governante.","a ênfase na propriedade acaba por esvaziar qualquer possibilidade real de igualdade.","a crença na razão humana o impede de reconhecer os direitos naturais dos indivíduos."],"correta":2,"expl":"Todo o sistema de Locke se funda na valorização da propriedade. Para seus críticos, como Rousseau, isso esvazia a igualdade, que seria o direito fundamental."},{"id":13,"bloco":"contrato","tipo":"mc","codigo":"ZVKA","enunciado":"Rousseau afirma que alguns indivíduos precisam ser “obrigados a ser livres”. A expressão faz sentido porque, para ele:","texto":null,"afirm":null,"alts":["ser livre é obedecer à vontade geral, e quem age de forma egoísta deve ser forçado a aceitá-la.","a liberdade natural deve ser entregue ao soberano em troca de proteção contra a morte violenta.","a liberdade consiste em agir sem nenhum impedimento externo, nem mesmo o das leis do Estado.","os representantes eleitos sabem melhor do que o povo o que convém à liberdade de todos os cidadãos."],"correta":0,"expl":"Submeter-se à vontade geral é obedecer à lei que o próprio cidadão ajudou a fazer. Quem rejeita a vontade geral por egoísmo deve ser forçado a aceitar as deliberações coletivas."},{"id":14,"bloco":"contrato","tipo":"af","codigo":"ZMMR","enunciado":"Sobre Rousseau, analise as afirmativas:","texto":null,"afirm":["O povo é soberano, mas essa soberania pode ser delegada a representantes eleitos.","Um regime de assembleias participativas só funcionaria em pequenas unidades políticas.","A liberdade e a compaixão estão entre as qualidades humanas do estado de natureza."],"alts":["I e II apenas","I e III apenas","II e III apenas","I, II e III"],"correta":2,"expl":"II e III estão corretas. A I é falsa: para Rousseau, a soberania não se representa; o povo deve integrar o governo, discutindo e votando as leis."},{"id":15,"bloco":"kant","tipo":"af","codigo":"PCNV","enunciado":"Sobre a ética kantiana, analise as afirmativas:","texto":null,"afirm":["As regras morais são tão firmes e universais quanto os princípios matemáticos ou físicos.","O termo “máxima” designa a regra usada para julgar uma ação como boa ou como má.","A ética kantiana é chamada de deontológica porque se baseia nas consequências das ações."],"alts":["I apenas","I e II apenas","II e III apenas","I, II e III"],"correta":1,"expl":"I e II estão corretas. “Deontológica” significa relativa a deveres, que são inegociáveis; quem julga pelas consequências é o consequencialismo."},{"id":16,"bloco":"kant","tipo":"mc","codigo":"USDP","enunciado":"Kant distingue a lei moral interna da lei externa (o direito positivo). A lei externa existe para:","texto":null,"afirm":null,"alts":["substituir a lei moral interna, que cada indivíduo deixa de seguir ao viver em sociedade.","garantir a maior felicidade possível para o maior número de pessoas de uma sociedade.","expressar a vontade do soberano absoluto, que está acima de todas as leis que cria.","restringir a liberdade de cada um na medida necessária para respeitar a liberdade de todos."],"correta":3,"expl":"A lei interna é o fundamento ético e caracteriza o direito natural. A lei externa trata da influência de um indivíduo sobre outro e pode restringir a liberdade de cada um para proteger a de todos."},{"id":17,"bloco":"kant","tipo":"mc","codigo":"TWSN","enunciado":"Para Kant, os fins que cada ser humano deve buscar, como deveres que impõe a si mesmo, são:","texto":null,"afirm":null,"alts":["a própria felicidade e a perfeição dos outros.","a própria perfeição e a felicidade dos outros.","o próprio prazer e a utilidade para a maioria.","a salvação da alma e a obediência ao Estado."],"correta":1,"expl":"A perfeição própria vem do pleno desenvolvimento das capacidades intelectuais, morais e físicas. A felicidade dos outros depende de respeitar aquilo que cada um entende como seu direito."},{"id":18,"bloco":"kant","tipo":"mc","codigo":"TJPV","enunciado":"Kant critica os gregos antigos, para quem a finalidade das ações humanas era a felicidade. Seu argumento é que:","texto":null,"afirm":null,"alts":["a felicidade só pode ser alcançada depois da morte, como recompensa pelos deveres cumpridos.","a felicidade depende de um cálculo de prazeres, que nenhum ser humano consegue fazer com precisão.","se fosse permanente, deixaria de ser felicidade; se passageira, não pode ser a finalidade da ação.","a felicidade é uma ilusão do véu de Maia, que nos afasta do contato com o mundo real."],"correta":2,"expl":"Por isso Kant propõe uma ética do dever, fundada na razão e na liberdade, ligada à busca da autonomia: o que importa é ser digno da felicidade."},{"id":19,"bloco":"kant","tipo":"mc","codigo":"STTA","enunciado":"Uma crítica comum à ética de Kant é que ela seria:","texto":null,"afirm":null,"alts":["rigorosa demais e pouco aberta a exceções, mesmo diante de casos extremos.","relativista, pois faz as normas morais variarem conforme a cultura e a época.","consequencialista, pois julga cada ação pelos resultados que ela produz.","hedonista, pois coloca o prazer imediato como a finalidade da ação humana."],"correta":0,"expl":"Para Kant, nem para salvar uma vida a mentira se justifica. A defesa dele: justificar ações erradas em nome de fins nobres pode ter efeitos desastrosos."},{"id":20,"bloco":"schop","tipo":"mc","codigo":"VHEB","enunciado":"Para Schopenhauer, a morte não deve ser temida porque:","texto":null,"afirm":null,"alts":["a alma imortal será recompensada em uma vida eterna, longe das ilusões do mundo material.","a vida se repetirá incontáveis vezes, exatamente na mesma sequência e na mesma ordem.","a natureza é indiferente a cada um de nós, e a morte nos livra da dor que caracteriza a vida.","a razão nos dá pleno controle sobre a vontade de viver e sobre o medo do desconhecido."],"correta":2,"expl":"Tufões e acidentes fazem vítimas sem distinção, e o tempo leva a todos. Além disso, a morte liberta do ciclo de sofrimento da vida. A terceira alternativa é o eterno retorno de Nietzsche."},{"id":21,"bloco":"schop","tipo":"mc","codigo":"ZTYD","enunciado":"Para Schopenhauer, a vontade de viver de cada indivíduo é:","texto":null,"afirm":null,"alts":["a manifestação de uma vontade cósmica, presente em todas as criaturas vivas.","uma escolha racional, que cada sujeito controla de forma autônoma e consciente.","uma força afirmadora da vida, que se expande pela arte e pelo pensamento livre.","uma convenção social, aprendida com os costumes e transmitida pela educação."],"correta":0,"expl":"A vontade individual é parte de uma vontade universal, transcendente, que se manifesta aqui e ali em diferentes sujeitos. A terceira alternativa descreve a vontade de potência de Nietzsche."},{"id":22,"bloco":"schop","tipo":"af","codigo":"ZWPS","enunciado":"Sobre Schopenhauer, analise as afirmativas:","texto":null,"afirm":["Foi influenciado por Kant e foi também um crítico severo de Hegel.","A alegoria do véu de Maia vem da tradição grega, em especial de Platão.","A nossa subjetividade, diferentemente dos objetos, pode ser acessada em sua essência."],"alts":["I apenas","I e II apenas","I e III apenas","II e III apenas"],"correta":2,"expl":"I e III estão corretas. A II é falsa: o véu de Maia vem do hinduísmo e do budismo (os Vedas e o Bagavata Purana), que a Europa conheceu no século XIX."},{"id":23,"bloco":"schop","tipo":"mc","codigo":"ESHD","enunciado":"Ao afirmar que quase nunca controlamos a nossa vontade, Schopenhauer se torna um dos primeiros críticos:","texto":null,"afirm":null,"alts":["da moral cristã, pois ela nega a vida em nome de uma recompensa depois da morte.","da razão iluminista, pois a razão deixa de ser guia seguro para a emancipação humana.","do absolutismo, pois um soberano todo-poderoso esmaga a vontade dos seus súditos.","do utilitarismo, pois a felicidade não pode ser medida por uma aritmética moral."],"correta":1,"expl":"Se a vontade nos governa, a certeza iluminista de que a razão conduz à autonomia é abalada. Essa ideia antecipa os estudos sobre o inconsciente do fim do século XIX."},{"id":24,"bloco":"nietz","tipo":"mc","codigo":"XZRY","enunciado":"Nietzsche foi da devoção à decepção em relação a Schopenhauer e a Wagner. Esse percurso ilustra uma característica da sua obra:","texto":null,"afirm":null,"alts":["o sistema: cada conceito ocupa um lugar fixo, como nas obras de Kant e de Hegel.","a fidelidade: ele permaneceu discípulo de seus mestres até o fim da vida.","a neutralidade: ele evitava julgar outros autores e as suas ideias.","a contradição: os conceitos mudavam à medida que o seu pensamento evoluía."],"correta":3,"expl":"A obra de Nietzsche é fragmentada (ensaios, aforismos, poesia) e cheia de contradições: o que dizia hoje podia ser bem diferente do que diria amanhã."},{"id":25,"bloco":"nietz","tipo":"mc","codigo":"SZUJ","enunciado":"Ao criticar Sócrates, Nietzsche retorna aos sofistas porque, como eles, valoriza:","texto":null,"afirm":null,"alts":["os efeitos que um discurso provoca, independentemente do seu teor de verdade.","a busca racional de uma verdade eterna, que o diálogo permite alcançar.","a humildade do sábio, que reconhece nada saber e por isso busca a verdade.","o martírio por ideias, que dá força moral a quem morre por suas convicções."],"correta":0,"expl":"Para Nietzsche, o problema de Sócrates não era o que dizia, mas como dizia: a humildade e o martírio o tornavam simpático. Os sofistas viam o discurso pelos efeitos que produz."},{"id":26,"bloco":"nietz","tipo":"mc","codigo":"UNYK","enunciado":"Em um sentido ainda mais metafórico, a frase “Deus está morto” pode indicar a crise:","texto":null,"afirm":null,"alts":["da ciência, que passou a negar a existência do mundo material.","do Estado absolutista, que se dizia escolhido pela vontade divina.","da razão, tomada desde o Iluminismo como fonte da moral e da verdade.","da arte, que deixou de expressar a vontade em sua essência."],"correta":2,"expl":"Em primeiro plano, é a moral cristã, de submissão ao sobrenatural, que deve sucumbir. Numa “metáfora dentro da metáfora”, “Deus” pode ser a própria razão iluminista."},{"id":27,"bloco":"nietz","tipo":"mc","codigo":"UXTZ","enunciado":"Para Nietzsche, a valorização de Dionísio significa que:","texto":null,"afirm":null,"alts":["a cultura deve voltar ao equilíbrio, à medida e à clareza do pensamento racional.","a Filosofia não basta: é preciso a experiência estética, a emoção e a desmedida.","a música, por ser cerebral e matemática, é a arte que mais resgata o instinto.","o ser humano deve renunciar aos desejos para escapar do sofrimento e do tédio."],"correta":1,"expl":"Dionísio expressa a emoção, a desmedida (hubris) e a paixão. Com o pensamento, a experiência estética formaria uma nova totalidade. Para Nietzsche, é a dança, e não a música, que resgata o instintivo."},{"id":28,"bloco":"nietz","tipo":"af","codigo":"SNPG","enunciado":"Sobre Nietzsche, analise as afirmativas:","texto":null,"afirm":["Sua obra é fragmentada, feita muitas vezes de ensaios e aforismos.","Para ele, a cultura ocidental é herdeira do triunfo do espírito apolíneo.","Uma experiência escolar pouco desafiante atrofia a vontade de potência."],"alts":["I apenas","I e II apenas","II e III apenas","I, II e III"],"correta":3,"expl":"As três estão corretas. A moral do ressentimento, a escola pouco desafiante e o trabalho entediante atrofiam a potência; a arte, o pensamento livre e a paixão a expandem."},{"id":29,"bloco":"nietz","tipo":"mc","codigo":"KJAB","enunciado":"“O homem é uma corda estendida entre o animal e o super-homem – uma corda sobre um abismo.” A imagem indica que:","texto":null,"afirm":null,"alts":["o ser humano deve voltar à animalidade para reencontrar a sua bondade natural perdida.","a vida é um pêndulo entre o sofrimento e o tédio, sem nenhuma saída possível.","o progresso humano é linear e caminha rumo a um juízo final que trará a redenção.","criar novos valores é uma travessia arriscada, que deve ser enfrentada em nome da vida."],"correta":3,"expl":"O nascimento do novo homem traz riscos (sanções, isolamento, dificuldade de viver em sociedade), que devem ser enfrentados com a vontade de potência."},{"id":30,"bloco":"final","tipo":"quem","codigo":"EXWR","enunciado":"Quem disse?","texto":"“Não há nada mais absurdo do que o que se encontra nos livros de Filosofia.”","afirm":null,"alts":["Nietzsche","Maquiavel","Hobbes","Schopenhauer"],"correta":2,"expl":"Hobbes, no Leviatã, criticando a filosofia carregada de “emotividade”. Contra ela, propunha uma Filosofia de rigor geométrico, com axiomas, definições e demonstrações."},{"id":31,"bloco":"final","tipo":"quem","codigo":"TSMG","enunciado":"Quem disse?","texto":"“Não se trata de buscar ser feliz, e sim de ser digno da felicidade.”","afirm":null,"alts":["Kant","Rousseau","Schopenhauer","Locke"],"correta":0,"expl":"É a ideia de Kant: a ética do dever não busca a felicidade, mas a dignidade de quem age por dever."},{"id":32,"bloco":"final","tipo":"quem","codigo":"JZSR","enunciado":"Quem disse?","texto":"“O mundo é minha representação.”","afirm":null,"alts":["Kant","Schopenhauer","Hobbes","Nietzsche"],"correta":1,"expl":"É a frase que abre O mundo como vontade e como representação (1819), de Schopenhauer. Ela segue Kant, mas não é dele."},{"id":33,"bloco":"final","tipo":"quem","codigo":"TSPU","enunciado":"Quem disse?","texto":"“A soberania não se representa.”","afirm":null,"alts":["Locke","Hobbes","Maquiavel","Rousseau"],"correta":3,"expl":"Rousseau: o povo é soberano e deve participar do governo, reunido em assembleias. Locke, ao contrário, aceita o governo por representantes."},{"id":34,"bloco":"final","tipo":"quem","codigo":"YBKL","enunciado":"Quem disse?","texto":"“Eu acreditaria somente num deus que soubesse dançar.”","afirm":null,"alts":["Schopenhauer","Maquiavel","Nietzsche","Rousseau"],"correta":2,"expl":"Nietzsche, em Assim falou Zaratustra: a dança resgata o instintivo e o inesperado, o espírito dionisíaco."},{"id":35,"bloco":"final","tipo":"quem","codigo":"RDRZ","enunciado":"Quem disse?","texto":"“É muito mais seguro ser temido que amado.”","afirm":null,"alts":["Hobbes","Maquiavel","Kant","Locke"],"correta":1,"expl":"Maquiavel, em O príncipe: o governante não deve abrir mão do uso da força. Hobbes também fala do medo, mas a frase é do florentino."}];
+const BLOCOS = {
+  maq:{nome:"Maquiavel", sub:"O príncipe e o republicano", cor:"--b-util"},
+  contrato:{nome:"Contratualismo", sub:"Hobbes, Locke e Rousseau", cor:"--b-contrato"},
+  kant:{nome:"Ética kantiana", sub:"Kant e o dever", cor:"--b-kant"},
+  schop:{nome:"Schopenhauer", sub:"Vontade e representação", cor:"--b-schop"},
+  nietz:{nome:"Nietzsche", sub:"Crítica à modernidade", cor:"--b-nietz"},
+  final:{nome:"Quem disse?", sub:"Rodada final · vale dobro", cor:"--b-final"}
+};
+const ORDEM_BLOCOS = ["maq","contrato","kant","schop","nietz","final"];
+const DUR = {mc:60, af:75, vf:25, quem:30};
+const ROM = ["I","II","III","IV"];
+const afirmHTML = q => q.afirm ? `<ol class="afirm">${q.afirm.map((a, i) => `<li><b>${ROM[i]}.</b> <span>${esc(a)}</span></li>`).join("")}</ol>` : "";
+const CORES = [
+  {n:"Coral", c:"#E0532C", t:"#FFFFFF"}, {n:"Azul", c:"#2A67D3", t:"#FFFFFF"}, {n:"Verde", c:"#23894F", t:"#FFFFFF"},
+  {n:"Ouro", c:"#E3A514", t:"#1A1300"}, {n:"Roxo", c:"#7447C4", t:"#FFFFFF"}, {n:"Rosa", c:"#CF3D78", t:"#FFFFFF"},
+  {n:"Ciano", c:"#0E8C9C", t:"#FFFFFF"}, {n:"Grafite", c:"#48526A", t:"#FFFFFF"}
+];
+const LET = "ABCD";
+const porId = Object.fromEntries(Q.map(q => [q.id, q]));
+const porCodigo = Object.fromEntries(Q.map(q => [q.codigo, q]));
+
+const $app = document.getElementById("app");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const load = k => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e){ return null; } };
+const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} };
+const cor = i => CORES[((i % CORES.length) + CORES.length) % CORES.length];
+const blocoVar = b => `--bc:var(${BLOCOS[b].cor})`;
+const pts = n => n.toLocaleString("pt-BR");
+
+/* ---------------- pontuação ---------------- */
+function calcPontos(q, acertou, restanteSeg){
+  if (!acertou) return 0;
+  const bonus = Math.round((50 * Math.max(0, restanteSeg) / DUR[q.tipo]) / 5) * 5;
+  return (100 + bonus) * (q.tipo === "quem" ? 2 : 1);
+}
+
+/* ---------------- estado ---------------- */
+let modo = null;              // "prof" | "grupo" | null
+let P = load("arena3-prof-v1");
+let G = load("arena3-grupo-v1");
+const saveP = () => save("arena3-prof-v1", P);
+const saveG = () => save("arena3-grupo-v1", G);
+let ui = {};                  // estado efêmero de tela
+
+function novoProf(){
+  return { fase:"config", blocos:ORDEM_BLOCOS.slice(),
+    grupos:[1,2,3,4,5].map(i => ({nome:"Grupo " + i, cor:i-1, pontos:0})),
+    ordem:[], idx:0, etapa:"codigo", inicio:0, voltar:"jogo" };
+}
+
+/* ---------------- roteamento ---------------- */
+function rota(){
+  const h = location.hash.replace("#","");
+  if (h === "professor") modo = "prof";
+  else if (h === "grupo") modo = "grupo";
+  else modo = null;
+  ui = {};
+  render();
+}
+window.addEventListener("hashchange", rota);
+function ir(h){ if (location.hash === "#" + h) rota(); else location.hash = h; }
+
+function render(){
+  if (modo === "prof") return renderProf();
+  if (modo === "grupo") return renderGrupo();
+  renderInicio();
+}
+
+/* ---------------- início ---------------- */
+function renderInicio(){
+  $app.innerHTML = `
+  <header class="brand">
+    <h1>Arena Filosófica<span>Revisão do 4º bimestre · Filosofia · 3ª série · nível avançado</span></h1>
+    <p class="ticker">Maquiavel · Hobbes · Locke · Rousseau · Kant · Schopenhauer · Nietzsche</p>
+  </header>
+  <section class="roles" aria-label="Escolha como vai jogar">
+    <button class="role" id="go-grupo">
+      <span class="tag">No celular</span>
+      <h2>Sou um grupo</h2>
+      <p class="muted">Digite o código que aparece no telão, responda antes do tempo acabar e acumule pontos.</p>
+    </button>
+    <button class="role" id="go-prof">
+      <span class="tag">No projetor</span>
+      <h2>Sou o professor</h2>
+      <p class="muted">Escolha os blocos, mostre o código de cada rodada, controle o tempo, revele as respostas e monte o pódio.</p>
+    </button>
+  </section>
+  <section class="panel" aria-labelledby="como">
+    <h2 id="como">Como funciona</h2>
+    <div class="how">
+      <div><b>1. O código libera a pergunta</b><p class="muted">Cada rodada tem um código de quatro letras que só aparece no telão.</p></div>
+      <div><b>2. Acerto e rapidez valem pontos</b><p class="muted">100 pontos por acerto e até 50 de bônus pela velocidade. Há análises de afirmativas, e a rodada “Quem disse?” vale o dobro.</p></div>
+      <div><b>3. O pódio sai no fim</b><p class="muted">Cada celular mostra o total do grupo. O professor lança os totais no placar e revela o pódio.</p></div>
+    </div>
+  </section>`;
+  document.getElementById("go-grupo").onclick = () => ir("grupo");
+  document.getElementById("go-prof").onclick = () => ir("professor");
+}
+
+/* =====================================================================
+   PROFESSOR
+   ===================================================================== */
+function renderProf(){
+  if (!P) { P = novoProf(); saveP(); }
+  pedirTelaAcesa();
+  if (P.fase === "config") return profConfig();
+  if (P.fase === "jogo") return profJogo();
+  if (P.fase === "placar") return profPlacar();
+  if (P.fase === "podio") return profPodio();
+}
+
+function voltarInicio(){ return `<button class="btn ghost" id="sair">← Início</button>`; }
+function ligarSair(){ const b = document.getElementById("sair"); if (b) b.onclick = () => ir(""); }
+
+function profConfig(){
+  const total = Q.filter(q => P.blocos.includes(q.bloco)).length;
+  $app.innerHTML = `
+  <div class="spread"><p class="eyebrow">Professor · preparar a partida</p>${voltarInicio()}</div>
+  <header class="brand"><h1>Arena Filosófica<span>Monte a partida da 3ª série</span></h1></header>
+  <section class="panel" aria-labelledby="t-blocos">
+    <div class="spread"><h2 id="t-blocos">Blocos de perguntas</h2><p class="count">${total} rodadas</p></div>
+    <div class="blocks">
+      ${ORDEM_BLOCOS.map(b => {
+        const n = Q.filter(q => q.bloco === b).length;
+        return `<label class="blk" style="${blocoVar(b)}"><input type="checkbox" id="blk-${b}" data-b="${b}" ${P.blocos.includes(b) ? "checked" : ""}>
+          <span><b>${BLOCOS[b].nome}</b><small>${BLOCOS[b].sub} · ${n} perguntas</small></span></label>`;
+      }).join("")}
+    </div>
+    <p class="muted">As perguntas são mais longas: cada rodada leva cerca de 2 minutos, com a correção. Para uma aula de 50 minutos, escolha uns 22 a 25 rodadas.</p>
+  </section>
+  <section class="panel" aria-labelledby="t-grupos">
+    <div class="spread"><h2 id="t-grupos">Grupos</h2><button class="btn ghost" id="add-g" ${P.grupos.length >= 10 ? "disabled" : ""}>+ Grupo</button></div>
+    <div class="teams">
+      ${P.grupos.map((g, i) => `<div class="team-row">
+        <span class="dot" style="background:${cor(g.cor).c}" aria-hidden="true"></span>
+        <input type="text" id="g-nome-${i}" data-i="${i}" value="${esc(g.nome)}" maxlength="24" aria-label="Nome do grupo ${i+1}">
+        <button class="icon-btn" data-cor="${i}" aria-label="Trocar a cor do grupo ${i+1}" title="Trocar cor">◐</button>
+        <button class="icon-btn" data-del="${i}" aria-label="Remover o grupo ${i+1}" ${P.grupos.length <= 2 ? "disabled" : ""}>×</button>
+      </div>`).join("")}
+    </div>
+    <p class="muted">Use os mesmos nomes que os grupos vão digitar no celular. Isso facilita lançar os pontos no placar.</p>
+  </section>
+  <div class="row end">
+    <button class="btn" id="comecar" ${total ? "" : "disabled"}>Começar a partida →</button>
+  </div>`;
+  ligarSair();
+  $app.querySelectorAll("[data-b]").forEach(cb => cb.onchange = () => {
+    const b = cb.dataset.b;
+    P.blocos = ORDEM_BLOCOS.filter(x => x === b ? cb.checked : P.blocos.includes(x));
+    saveP(); profConfig();
+  });
+  $app.querySelectorAll("input[data-i]").forEach(inp => inp.oninput = () => { P.grupos[+inp.dataset.i].nome = inp.value; saveP(); });
+  $app.querySelectorAll("[data-cor]").forEach(b => b.onclick = () => { const g = P.grupos[+b.dataset.cor]; g.cor = (g.cor + 1) % CORES.length; saveP(); profConfig(); });
+  $app.querySelectorAll("[data-del]").forEach(b => b.onclick = () => { P.grupos.splice(+b.dataset.del, 1); saveP(); profConfig(); });
+  document.getElementById("add-g").onclick = () => { const n = P.grupos.length; P.grupos.push({nome:"Grupo " + (n+1), cor:n % CORES.length, pontos:0}); saveP(); profConfig(); };
+  document.getElementById("comecar").onclick = () => {
+    P.grupos.forEach((g, i) => { g.nome = (g.nome || "").trim() || ("Grupo " + (i+1)); g.pontos = 0; });
+    P.ordem = Q.filter(q => P.blocos.includes(q.bloco)).map(q => q.id);
+    P.idx = 0; P.etapa = "codigo"; P.inicio = 0; P.fase = "jogo";
+    saveP(); renderProf();
+  };
+}
+
+function restanteProf(q){
+  if (P.etapa !== "tempo") return P.etapa === "codigo" ? DUR[q.tipo] : 0;
+  return Math.max(0, DUR[q.tipo] - (Date.now() - P.inicio) / 1000);
+}
+
+function profJogo(){
+  const q = porId[P.ordem[P.idx]];
+  const b = BLOCOS[q.bloco];
+  const n = P.ordem.length;
+  const ult = P.idx === n - 1;
+  const chip = `<span class="chip ${q.tipo === "quem" ? "dobro" : ""}" style="${blocoVar(q.bloco)}">${b.nome}${q.tipo === "quem" ? " · vale dobro" : ""}</span>`;
+  const top = `<div class="topbar">
+      <span class="count">Rodada ${P.idx + 1} de ${n}</span>
+      <div class="progress" aria-hidden="true"><i style="width:${(P.idx / n) * 100}%"></i></div>
+      <div class="row"><button class="btn ghost" id="ver-placar">Placar</button></div>
+    </div>`;
+  let corpo = "";
+  if (P.etapa === "codigo"){
+    corpo = `
+    <section class="stage">
+      <div class="row">${chip}<span class="muted">${b.sub}</span></div>
+      <div class="ticket" role="group" aria-label="Código da rodada">
+        <small>Digitem no celular o código da rodada ${P.idx + 1}</small>
+        <span class="code">${q.codigo}</span>
+        <small>${q.tipo === "af" ? "Análise de afirmativas" : q.tipo === "quem" ? "Quem disse?" : "Múltipla escolha"} · ${DUR[q.tipo]} segundos</small>
+      </div>
+      <div class="row end"><button class="btn" id="iniciar">Iniciar o tempo e mostrar a pergunta</button></div>
+    </section>`;
+  } else {
+    const revel = P.etapa === "revelado";
+    const r = restanteProf(q);
+    corpo = `
+    <section class="stage">
+      <div class="spread">
+        <div class="row">${chip}<span class="mini-ticket"><small>código</small><b>${q.codigo}</b></span></div>
+        ${P.etapa === "tempo" ? relogio(r, DUR[q.tipo], "prof-clock") : `<span class="count">${revel ? "Resposta revelada" : "Tempo esgotado"}</span>`}
+      </div>
+      <div class="question">
+        <h2>${esc(q.enunciado)}</h2>
+        ${q.texto ? `<p class="quote" style="${blocoVar(q.bloco)}">${esc(q.texto)}</p>` : ""}
+        ${afirmHTML(q)}
+        <ul class="alts">
+          ${q.alts.map((a, i) => `<li><div class="alt ${revel ? (i === q.correta ? "right" : "dim") : ""}"><span class="L">${q.tipo === "vf" ? (i ? "F" : "V") : LET[i]}</span><span>${esc(a)}</span></div></li>`).join("")}
+        </ul>
+        ${revel ? `<p class="explain"><b>Resposta: ${q.tipo === "vf" ? q.alts[q.correta] : LET[q.correta]}.</b> ${esc(q.expl)}</p>` : ""}
+      </div>
+      <div class="row end">
+        ${P.etapa === "tempo" ? `<button class="btn ghost" id="encerrar">Encerrar o tempo agora</button>` : ""}
+        ${P.etapa === "fim" ? `<button class="btn" id="revelar">Revelar a resposta</button>` : ""}
+        ${revel ? (ult ? `<button class="btn" id="final">Ir para o placar final →</button>` : `<button class="btn" id="proxima">Próxima rodada →</button>`) : ""}
+      </div>
+    </section>`;
+  }
+  $app.innerHTML = top + corpo;
+  document.getElementById("ver-placar").onclick = () => { P.voltar = "jogo"; P.fase = "placar"; saveP(); renderProf(); };
+  const on = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = fn; };
+  on("iniciar", () => { P.etapa = "tempo"; P.inicio = Date.now(); saveP(); profJogo(); });
+  on("encerrar", () => { P.etapa = "fim"; saveP(); profJogo(); });
+  on("revelar", () => { P.etapa = "revelado"; saveP(); profJogo(); });
+  on("proxima", () => { P.idx++; P.etapa = "codigo"; P.inicio = 0; saveP(); profJogo(); window.scrollTo(0,0); });
+  on("final", () => { P.voltar = "jogo"; P.fase = "placar"; saveP(); renderProf(); });
+}
+
+function relogio(rest, total, id){
+  const s = Math.ceil(rest);
+  return `<div class="clock ${s <= 10 ? "low" : ""}" id="${id}" style="min-width:min(320px, 100%)" role="timer" aria-label="${s} segundos restantes">
+    <div class="bar"><i style="width:${(rest / total) * 100}%"></i></div><span class="num">${s}</span></div>`;
+}
+function atualizaRelogio(id, rest, total){
+  const el = document.getElementById(id); if (!el) return;
+  const s = Math.ceil(rest);
+  el.querySelector(".num").textContent = s;
+  el.querySelector(".bar i").style.width = (rest / total) * 100 + "%";
+  el.classList.toggle("low", s <= 10);
+  el.setAttribute("aria-label", s + " segundos restantes");
+}
+
+function profPlacar(){
+  const ordenados = P.grupos.map((g, i) => ({...g, i})).sort((a, b) => b.pontos - a.pontos);
+  const max = Math.max(1, ...P.grupos.map(g => g.pontos));
+  const fim = P.idx >= P.ordem.length - 1 && P.etapa === "revelado";
+  $app.innerHTML = `
+  <div class="spread"><p class="eyebrow">Placar · rodada ${Math.min(P.idx + 1, P.ordem.length)} de ${P.ordem.length}</p>
+    <div class="row">${P.voltar === "jogo" && !fim ? `<button class="btn ghost" id="voltar">← Voltar à rodada</button>` : ""}</div></div>
+  <h1 style="font-size:clamp(2rem,6vw,3rem)">Placar</h1>
+  <div class="score-grid">
+    <section class="panel" aria-labelledby="t-lanc">
+      <h2 id="t-lanc">Lançar os totais</h2>
+      <p class="muted">Peça a cada grupo o total que aparece no celular.</p>
+      <div class="score-in">
+        ${P.grupos.map((g, i) => `<label for="pt-${i}"><span class="dot" style="background:${cor(g.cor).c}" aria-hidden="true"></span><span class="nm">${esc(g.nome)}</span>
+          <input id="pt-${i}" data-i="${i}" type="number" inputmode="numeric" min="0" step="5" value="${g.pontos}"></label>`).join("")}
+      </div>
+    </section>
+    <section class="panel" aria-labelledby="t-rank">
+      <h2 id="t-rank">Ranking</h2>
+      <ol class="rank" id="rank">${rankHTML(ordenados, max)}</ol>
+    </section>
+  </div>
+  <div class="row end">
+    <button class="btn ghost" id="novo">Nova partida</button>
+    <button class="btn" id="podio">Revelar o pódio</button>
+  </div>
+  <div id="conf-novo"></div>`;
+  $app.querySelectorAll("input[data-i]").forEach(inp => inp.oninput = () => {
+    P.grupos[+inp.dataset.i].pontos = Math.max(0, parseInt(inp.value, 10) || 0); saveP();
+    const ord = P.grupos.map((g, i) => ({...g, i})).sort((a, b) => b.pontos - a.pontos);
+    document.getElementById("rank").innerHTML = rankHTML(ord, Math.max(1, ...P.grupos.map(g => g.pontos)));
+  });
+  const v = document.getElementById("voltar"); if (v) v.onclick = () => { P.fase = "jogo"; saveP(); renderProf(); };
+  document.getElementById("podio").onclick = () => { P.fase = "podio"; saveP(); renderProf(); };
+  document.getElementById("novo").onclick = () => {
+    document.getElementById("conf-novo").innerHTML = `<div class="confirm"><p><b>Começar uma nova partida?</b> O placar atual será apagado.</p>
+      <div class="row"><button class="btn danger" id="sim-novo">Sim, nova partida</button><button class="btn ghost" id="nao-novo">Cancelar</button></div></div>`;
+    document.getElementById("sim-novo").onclick = () => { const grupos = P.grupos.map(g => ({...g, pontos:0})); const blocos = P.blocos; P = novoProf(); P.grupos = grupos; P.blocos = blocos; saveP(); renderProf(); };
+    document.getElementById("nao-novo").onclick = () => { document.getElementById("conf-novo").innerHTML = ""; };
+  };
+}
+function rankHTML(ord, max){
+  return ord.map((g, k) => { const c = cor(g.cor);
+    return `<li><span class="pos">${k + 1}</span><div class="track"><div class="fill" style="width:${Math.max(18, (g.pontos / max) * 100)}%; background:${c.c}; color:${c.t}">${esc(g.nome)}</div></div><span class="pts">${pts(g.pontos)}</span></li>`; }).join("");
+}
+
+function profPodio(){
+  const ord = P.grupos.map((g, i) => ({...g, i})).sort((a, b) => b.pontos - a.pontos);
+  const lug = [ord[1], ord[0], ord[2]];
+  const cls = ["s2","s1","s3"], num = [2,1,3];
+  $app.innerHTML = `
+  <div class="spread"><p class="eyebrow">Resultado final</p><button class="btn ghost" id="voltar">← Placar</button></div>
+  <h1 style="font-size:clamp(2.2rem,7vw,3.6rem)">Pódio da Arena</h1>
+  <section class="podium" aria-label="Pódio">
+    ${lug.map((g, k) => g ? `<div class="step ${cls[k]}"><span class="name">${esc(g.nome)}</span>
+      <div class="block" style="background:${cor(g.cor).c}; color:${cor(g.cor).t}"><span class="place">${num[k]}º</span><span class="p">${pts(g.pontos)} pts</span></div></div>` : `<div></div>`).join("")}
+  </section>
+  ${ord.length > 3 ? `<section class="panel"><h2>Demais colocações</h2><ol class="rank" start="4">${ord.slice(3).map((g, k) => `<li><span class="pos">${k + 4}</span><span style="font-weight:700">${esc(g.nome)}</span><span class="pts">${pts(g.pontos)}</span></li>`).join("")}</ol></section>` : ""}`;
+  document.getElementById("voltar").onclick = () => { P.fase = "placar"; saveP(); renderProf(); };
+}
+
+let wake = null;
+async function pedirTelaAcesa(){
+  if (wake || !("wakeLock" in navigator)) return;
+  try { wake = await navigator.wakeLock.request("screen"); wake.addEventListener("release", () => { wake = null; }); } catch(e){}
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && modo === "prof") pedirTelaAcesa(); });
+
+/* =====================================================================
+   GRUPO
+   ===================================================================== */
+function renderGrupo(){
+  if (!G || !G.nome) return grupoEntrar();
+  if (ui.mostrar) return grupoPlacar();
+  const a = G.atual;
+  if (a && porId[a.qid]){
+    const q = porId[a.qid];
+    const passou = (Date.now() - a.inicio) / 1000;
+    if (!a.travada && passou >= DUR[q.tipo]) travar(null);
+    if (!G.atual.vista) return grupoPergunta();
+    return grupoResultado();
+  }
+  grupoCodigo();
+}
+
+function gbar(){
+  const c = cor(G.cor);
+  return `<div class="gbar" style="background:${c.c}; color:${c.t}">
+    <span class="gname">${esc(G.nome)}</span>
+    <span class="gpts"><small>PONTOS</small>${pts(G.total)}</span></div>`;
+}
+
+function grupoEntrar(){
+  const sel = ui.cor ?? (G?.cor ?? 0);
+  $app.innerHTML = `
+  <div class="phone">
+    <div class="spread"><p class="eyebrow">Arena Filosófica · grupo</p>${voltarInicio()}</div>
+    <h1 style="font-size:2.2rem">Entrar na Arena</h1>
+    <div class="field"><label for="nome-g"><b>Nome do grupo</b></label>
+      <input id="nome-g" type="text" maxlength="24" placeholder="Ex.: Grupo 3" value="${esc(ui.nome ?? "")}" autocomplete="off"></div>
+    <div class="field"><b id="t-cor">Cor do grupo</b>
+      <div class="palette" role="group" aria-labelledby="t-cor">
+        ${CORES.map((c, i) => `<button class="swatch" data-c="${i}" style="background:${c.c}" aria-label="${c.n}" aria-pressed="${i === sel}"></button>`).join("")}
+      </div></div>
+    <p class="err" id="err"></p>
+    <button class="btn wide" id="entrar">Entrar</button>
+    <p class="muted">Use o nome que o professor combinou com a turma. A pontuação fica guardada neste celular.</p>
+  </div>`;
+  ligarSair();
+  const nome = document.getElementById("nome-g");
+  nome.oninput = () => { ui.nome = nome.value; };
+  $app.querySelectorAll("[data-c]").forEach(b => b.onclick = () => { ui.cor = +b.dataset.c; ui.nome = nome.value; grupoEntrar(); });
+  document.getElementById("entrar").onclick = () => {
+    const n = nome.value.trim();
+    if (!n) { document.getElementById("err").textContent = "Digite o nome do grupo para entrar."; nome.focus(); return; }
+    G = {nome:n, cor:sel, total:0, feitas:{}, atual:null};
+    saveG(); ui = {}; renderGrupo();
+  };
+}
+
+function grupoCodigo(){
+  const feitas = Object.values(G.feitas);
+  $app.innerHTML = `
+  <div class="phone">
+    ${gbar()}
+    <form id="f-cod" class="panel" novalidate>
+      <label for="cod" class="eyebrow">Código da rodada</label>
+      <input id="cod" class="code-in" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" value="${esc(ui.cod ?? "")}" aria-describedby="err">
+      <p class="err" id="err">${esc(ui.erro ?? "")}</p>
+      <button class="btn wide" type="submit">Liberar a pergunta</button>
+      <p class="muted">O código aparece no telão no começo de cada rodada.</p>
+    </form>
+    ${feitas.length ? `<section class="panel"><h2 style="font-size:1.1rem">Rodadas jogadas: ${feitas.length}</h2>
+      <div class="history">${Object.entries(G.feitas).map(([id, f]) => `<span class="${f.acertou ? "h-ok" : "h-no"}">${f.acertou ? "✓" : "✗"} +${f.pontos}</span>`).join("")}</div></section>` : ""}
+    <div class="row">
+      <button class="btn ghost" id="mostrar">Mostrar total ao professor</button>
+      <button class="btn ghost" id="trocar">Trocar de grupo</button>
+    </div>
+    <div id="conf-trocar"></div>
+  </div>`;
+  const inp = document.getElementById("cod");
+  inp.oninput = () => { inp.value = inp.value.toUpperCase().replace(/[^A-Z]/g, ""); ui.cod = inp.value; };
+  document.getElementById("f-cod").onsubmit = e => {
+    e.preventDefault();
+    const c = inp.value.toUpperCase().trim();
+    const q = porCodigo[c];
+    if (c.length < 4) { ui.erro = "O código tem quatro letras."; return grupoCodigo(); }
+    if (!q) { ui.erro = "Código não encontrado. Confira as letras no telão."; return grupoCodigo(); }
+    if (G.feitas[q.id]) { ui.erro = "Vocês já responderam esta rodada. Aguardem o próximo código."; return grupoCodigo(); }
+    G.atual = {qid:q.id, inicio:Date.now(), escolha:null, travada:false, vista:false};
+    saveG(); ui = {}; renderGrupo(); window.scrollTo(0,0);
+  };
+  document.getElementById("mostrar").onclick = () => { ui.mostrar = true; renderGrupo(); };
+  document.getElementById("trocar").onclick = () => {
+    document.getElementById("conf-trocar").innerHTML = `<div class="confirm"><p><b>Sair deste grupo?</b> Os ${pts(G.total)} pontos deste celular serão apagados.</p>
+      <div class="row"><button class="btn danger" id="sim-t">Sim, sair</button><button class="btn ghost" id="nao-t">Cancelar</button></div></div>`;
+    document.getElementById("sim-t").onclick = () => { G = null; saveG(); ui = {}; renderGrupo(); };
+    document.getElementById("nao-t").onclick = () => { document.getElementById("conf-trocar").innerHTML = ""; };
+  };
+  if (!ui.erro) setTimeout(() => { try { inp.focus({preventScroll:true}); } catch(e){} }, 50);
+}
+
+function grupoPlacar(){
+  const c = cor(G.cor);
+  $app.innerHTML = `
+  <div class="phone">
+    <div class="bigscore" style="background:${c.c}; color:${c.t}">
+      <span class="eyebrow" style="color:inherit; opacity:.85">Total do grupo</span>
+      <span style="font-family:var(--f-display); font-weight:800; font-size:1.8rem; overflow-wrap:anywhere">${esc(G.nome)}</span>
+      <span class="n">${pts(G.total)}</span>
+      <span>${Object.keys(G.feitas).length} rodadas · ${Object.values(G.feitas).filter(f => f.acertou).length} acertos</span>
+    </div>
+    <button class="btn wide" id="ok">Voltar</button>
+  </div>`;
+  document.getElementById("ok").onclick = () => { ui.mostrar = false; renderGrupo(); };
+}
+
+function travar(escolha){
+  const a = G.atual, q = porId[a.qid];
+  const passou = (Date.now() - a.inicio) / 1000;
+  a.escolha = escolha; a.travada = true;
+  const acertou = escolha !== null && escolha === q.correta;
+  a.acertou = acertou;
+  a.pontos = calcPontos(q, acertou, DUR[q.tipo] - passou);
+  G.feitas[q.id] = {acertou, pontos:a.pontos};
+  G.total += a.pontos;
+  saveG();
+}
+
+function grupoPergunta(){
+  const a = G.atual, q = porId[a.qid];
+  const rest = Math.max(0, DUR[q.tipo] - (Date.now() - a.inicio) / 1000);
+  const chip = `<span class="chip ${q.tipo === "quem" ? "dobro" : ""}" style="${blocoVar(q.bloco)}">${BLOCOS[q.bloco].nome}${q.tipo === "quem" ? " · vale dobro" : ""}</span>`;
+  if (a.travada){
+    const lbl = a.escolha === null ? "—" : (q.tipo === "vf" ? (a.escolha ? "F" : "V") : LET[a.escolha]);
+    $app.innerHTML = `
+    <div class="phone">
+      ${gbarSemPontos()}
+      <div class="locked">
+        <span class="eyebrow">Resposta registrada</span>
+        <span class="big">${lbl}</span>
+        <p class="muted">O resultado aparece quando o tempo da rodada acabar.</p>
+        ${relogio(rest, DUR[q.tipo], "g-clock")}
+        <button class="btn wide" id="ver" ${rest > 0 ? "disabled" : ""}>Ver o resultado</button>
+      </div>
+    </div>`;
+    document.getElementById("ver").onclick = () => { G.atual.vista = true; saveG(); renderGrupo(); window.scrollTo(0,0); };
+    return;
+  }
+  $app.innerHTML = `
+  <div class="phone">
+    ${gbarSemPontos()}
+    <div class="spread">${chip}</div>
+    ${relogio(rest, DUR[q.tipo], "g-clock")}
+    <h2 style="font-size:1.3rem; line-height:1.25">${esc(q.enunciado)}</h2>
+    ${q.texto ? `<p class="quote" style="${blocoVar(q.bloco)}; font-size:1.15rem">${esc(q.texto)}</p>` : ""}
+    ${afirmHTML(q)}
+    <div class="galts" role="group" aria-label="Alternativas">
+      ${q.alts.map((t, i) => `<button class="galt" data-a="${i}" aria-pressed="${ui.sel === i}"><span class="L">${q.tipo === "vf" ? (i ? "F" : "V") : LET[i]}</span><span>${esc(t)}</span></button>`).join("")}
+    </div>
+    <button class="btn wide" id="confirmar" ${ui.sel === undefined ? "disabled" : ""}>Confirmar a resposta</button>
+  </div>`;
+  $app.querySelectorAll("[data-a]").forEach(b => b.onclick = () => {
+    ui.sel = +b.dataset.a;
+    $app.querySelectorAll("[data-a]").forEach(x => x.setAttribute("aria-pressed", String(+x.dataset.a === ui.sel)));
+    document.getElementById("confirmar").disabled = false;
+  });
+  document.getElementById("confirmar").onclick = () => {
+    if (ui.sel === undefined) return;
+    if (G.atual.travada) return renderGrupo();
+    travar(ui.sel); ui = {}; renderGrupo(); window.scrollTo(0,0);
+  };
+}
+function gbarSemPontos(){
+  const c = cor(G.cor);
+  return `<div class="gbar" style="background:${c.c}; color:${c.t}"><span class="gname">${esc(G.nome)}</span><span class="gpts"><small>PONTOS</small>${pts(G.total - (G.atual && G.atual.travada && !G.atual.vista ? G.atual.pontos : 0))}</span></div>`;
+}
+
+function grupoResultado(){
+  const a = G.atual, q = porId[a.qid];
+  const certo = q.tipo === "vf" ? q.alts[q.correta] : `${LET[q.correta]}) ${q.alts[q.correta]}`;
+  const titulo = a.acertou ? "Acertou!" : (a.escolha === null ? "Tempo esgotado" : "Não foi dessa vez");
+  $app.innerHTML = `
+  <div class="phone">
+    ${gbar()}
+    <div class="verdict ${a.acertou ? "ok" : "no"}">
+      <h2>${titulo}</h2>
+      <span class="gain">+${pts(a.pontos)} pontos${a.acertou && q.tipo === "quem" ? " (dobro)" : ""}</span>
+    </div>
+    <section class="panel">
+      <p class="eyebrow">Resposta certa</p>
+      <p style="font-weight:700; font-size:1.1rem">${esc(certo)}</p>
+      <p>${esc(q.expl)}</p>
+    </section>
+    <button class="btn wide" id="prox">Próxima rodada</button>
+  </div>`;
+  document.getElementById("prox").onclick = () => { G.atual = null; saveG(); ui = {}; renderGrupo(); window.scrollTo(0,0); };
+}
+
+/* ---------------- relógio ---------------- */
+setInterval(() => {
+  if (modo === "prof" && P && P.fase === "jogo" && P.etapa === "tempo"){
+    const q = porId[P.ordem[P.idx]];
+    const r = restanteProf(q);
+    if (r <= 0){ P.etapa = "fim"; saveP(); profJogo(); }
+    else atualizaRelogio("prof-clock", r, DUR[q.tipo]);
+  }
+  if (modo === "grupo" && G && G.atual && !G.atual.vista){
+    const q = porId[G.atual.qid];
+    const r = Math.max(0, DUR[q.tipo] - (Date.now() - G.atual.inicio) / 1000);
+    atualizaRelogio("g-clock", r, DUR[q.tipo]);
+    if (r <= 0){
+      if (!G.atual.travada){ travar(null); ui = {}; renderGrupo(); }
+      else { const v = document.getElementById("ver"); if (v && v.disabled) v.disabled = false; }
+    }
+  }
+}, 250);
+
+rota();
+</script>
+</body>
+</html>
